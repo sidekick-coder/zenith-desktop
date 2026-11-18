@@ -61,8 +61,8 @@ function launch(profile: ProfileSchema) {
 </script>
 
 <template>
-  <div class="w-full p-4">
-    <div class="flex items-end justify-between mb-4">
+  <div class="w-full px-8 py-4">
+    <div class="flex items-end justify-between mb-8">
       <div>
         <h1 class="text-lg font-bold tracking-[-.045em]">Profiles</h1>
         <p class="text-sm text-muted-foreground">
@@ -74,19 +74,20 @@ function launch(profile: ProfileSchema) {
       </Button>
     </div>
 
-    <div class="flex flex-wrap gap-4">
-      <Card
-      v-for="profile in profiles" :key="profile.id"
-      class="size-[200px] group cursor-pointer hover:bg-muted"
-      @click="launch(profile)"
-      >
-        <CardContent class="flex flex-col items-center justify-center gap-4 p-6">
-          <div class="grid size-16 place-items-center rounded-2xl bg-primary/10 text-primary">
-            <AppWindow :size="31" :stroke-width="1.7" />
-          </div>
+    <div class="flex flex-wrap -mx-4">
+      <div v-for="profile in profiles" :key="profile.id" class="group cursor-pointer
+        hover:bg-muted flex gap-4 items-center p-4 rounded-lg transition-colors w-[300px]"
+        @click="launch(profile)">
+
+        <div class="grid size-16 place-items-center rounded-2xl bg-primary/10 text-primary">
+          <AppWindow :size="31" :stroke-width="1.7" />
+        </div>
+        <div class="flex flex-col gap-1">
           <span class="text-sm font-semibold">{{ profile.name }}</span>
-        </CardContent>
-      </Card>
+          <span class="text-xs">{{ profile.description }}</span>
+        </div>
+
+      </div>
     </div>
   </div>
 </template>
