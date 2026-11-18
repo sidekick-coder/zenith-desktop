@@ -12,13 +12,13 @@ import { Label } from '@/components/ui/label'
 import { profiles } from '@/data/profiles'
 
 const route = useRoute()
-const profile = computed(() => profiles.find((item) => item.id === route.params.id) ?? profiles[0])
+const profile = computed(() => profiles.find((item) => item.id === route.params.id))
 
-const name = ref(profile.value.name)
-const directory = ref(profile.value.directory)
+const name = ref(profile.value?.name ?? '')
+const directory = ref(profile.value?.directory ?? '')
 let nextVariableId = 0
 const envVariables = ref(
-  Object.entries(profile.value.env).map(([key, value]) => ({
+  Object.entries(profile.value?.env ?? {}).map(([key, value]) => ({
     id: nextVariableId++,
     key,
     value,
@@ -45,7 +45,7 @@ function save() {
 </script>
 
 <template>
-  <div class="w-full px-8 py-4">
+  <div v-if="profile" class="w-full px-8 py-4">
     <PageHeader>
       <div>
         <PageTitle>{{ profile.name }}</PageTitle>
@@ -146,5 +146,13 @@ function save() {
         </CardContent>
       </Card>
     </div>
+  </div>
+  <div v-else class="w-full px-8 py-4">
+    <PageHeader>
+      <div>
+        <PageTitle>Profile not found</PageTitle>
+        <PageSubtitle>This profile is no longer available.</PageSubtitle>
+      </div>
+    </PageHeader>
   </div>
 </template>
