@@ -1,8 +1,4 @@
-import ProfileRepository from 'core/repositories/ProfileRepository.ts'
-
-interface Platform {
-  profiles: ProfileRepository
-}
+import Platform from 'core/platform.ts'
 
 declare global {
   interface Window {
