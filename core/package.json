@@ -1,0 +1,11 @@
+{
+    "name": "core",
+    "version": "0.0.1",
+    "exports": {
+        "./schemas/*": "./schemas/*",
+        "./repositories/*": "./repositories/*"
+    },
+    "dependencies": {
+        "valibot": "^1.5.0"
+    }
+}
