@@ -67,7 +67,7 @@ const route = useRoute()
             <BreadcrumbList>
               <BreadcrumbItem><BreadcrumbPage class="text-muted-foreground">Workspace</BreadcrumbPage></BreadcrumbItem>
               <BreadcrumbSeparator />
-              <BreadcrumbItem><BreadcrumbPage>{{ route.name === 'settings' ? 'Settings' : 'Profiles' }}</BreadcrumbPage></BreadcrumbItem>
+              <BreadcrumbItem><BreadcrumbPage>{{ route.name === 'settings' ? 'Settings' : route.name === 'profile' ? 'Edit profile' : 'Profiles' }}</BreadcrumbPage></BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
