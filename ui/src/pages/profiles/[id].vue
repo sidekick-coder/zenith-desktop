@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { toTypedSchema } from '@vee-validate/valibot'
 import { useForm } from 'vee-validate'
 import { Check, Play, Trash2 } from '@lucide/vue'
@@ -11,71 +11,86 @@ import ProfileFormRuntime from '@/components/ProfileFormRuntime.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import PageSubtitle from '@/components/PageSubtitle.vue'
 import PageTitle from '@/components/PageTitle.vue'
-import { Button } from '@/components/ui/button'
-import { profiles } from '@/data/profiles'
+import { toast } from 'vue-sonner'
+import { $try } from '@/utils/try'
 
 const route = useRoute()
-const existingProfile = computed(() => profiles.find((item) => item.id === route.params.id))
-const saved = ref(false)
+const platform = window.platform
 
-function toFormValues(profile?: ProfileSchema) {
-  return {
-    id: profile?.id ?? '',
-    name: profile?.name ?? '',
-    directory: profile?.directory ?? '',
-    data_folder: profile?.data_folder ?? '',
-    env: { ...profile?.env },
-    node_path: profile?.node_path ?? '',
-    zenith_path: profile?.zenith_path ?? '',
-  }
-}
+const profile = ref<ProfileSchema>()
+const saving = ref(false)
 
 const { handleSubmit, resetForm } = useForm({
   validationSchema: toTypedSchema(profileSchema.create()),
-  initialValues: toFormValues(existingProfile.value),
 })
 
-watch(existingProfile, (profile) => {
-  if (profile) resetForm({ values: toFormValues(profile) })
+async function load() {
+  const response = await window.platform.profiles.findByIdOrFail(route.params.id as string)
+
+  resetForm({
+    values: response,
+  })
+
+  profile.value = response
+}
+
+const onSubmit = handleSubmit(async (values) => {
+  saving.value = true
+
+  const [error] = await $try(() => window.platform.profiles.updateById(values.id, values))
+
+  if (error) {
+    toast.error(error instanceof Error ? error.message : 'Failed to save profile.')
+    saving.value = false
+    return
+  }
+
+
+
+  toast.success('Saved successfully!')
+
+  await new Promise((resolve) => setTimeout(resolve, 800)) // simulate save delay
+
+  saving.value = false
 })
 
-const onSubmit = handleSubmit((values) => {
-  if (!existingProfile.value) return
-
-  existingProfile.value.name = values.name
-  existingProfile.value.directory = values.directory
-  existingProfile.value.data_folder = values.directory
-  existingProfile.value.env = values.env
-  existingProfile.value.node_path = values.node_path
-  existingProfile.value.zenith_path = values.zenith_path
-  existingProfile.value.updated_at = new Date().toISOString()
-
-  saved.value = true
-  window.setTimeout(() => {
-    saved.value = false
-  }, 2200)
-})
+onMounted(load)
 </script>
 
 <template>
-  <form v-if="existingProfile" class="w-full px-8 py-4" @submit="onSubmit">
+  <form
+    v-if="profile"
+    class="w-full px-8 py-4"
+    @submit="onSubmit"
+  >
     <PageHeader>
       <div>
-        <PageTitle>{{ existingProfile.name }}</PageTitle>
+        <PageTitle>{{ profile.name }}</PageTitle>
         <PageSubtitle>
           Configure how this Express application runs.
         </PageSubtitle>
       </div>
       <div class="flex items-center gap-2">
-        <Button type="button" variant="destructive">
+        <zd-btn-alert
+          variant="destructive"
+          :handle="() => platform.profiles.deleteById(profile!.id)"
+          @success="() => $router.push('/profiles')"
+        >
           <Trash2 :size="15" /> Delete profile
-        </Button>
-        <Button type="submit">
-          <Check :size="16" /> {{ saved ? 'Saved' : 'Save changes' }}
-        </Button>
-        <Button type="button" @click="onSubmit">
+        </zd-btn-alert>
+
+        <zd-btn
+          type="submit"
+          :loading="saving"
+        >
+          <Check :size="16" /> Save
+        </zd-btn>
+        <zd-btn
+          type="button"
+          @click="onSubmit"
+        >
           <Play :size="16" /> Lauch
-        </Button>
+        </zd-btn>
       </div>
     </PageHeader>
 
@@ -85,7 +100,10 @@ const onSubmit = handleSubmit((values) => {
       <ProfileFormRuntime />
     </div>
   </form>
-  <div v-else class="w-full px-8 py-4">
+  <div
+    v-else
+    class="w-full px-8 py-4"
+  >
     <PageHeader>
       <div>
         <PageTitle>Profile not found</PageTitle>

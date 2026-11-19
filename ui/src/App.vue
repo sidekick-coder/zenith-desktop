@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import 'vue-sonner/style.css'
+import { Toaster } from '@/components/ui/sonner'
 import { ref } from 'vue'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { CircleHelp, Command, LayoutGrid, Settings } from '@lucide/vue'
@@ -31,7 +33,7 @@ const route = useRoute()
 <template>
   <SidebarProvider>
     <Sidebar variant="sidebar">
-      <SidebarHeader >
+      <SidebarHeader>
         <div class="flex items-center gap-2.5 px-2 text-lg font-bold tracking-tight">
           <div class="grid size-7 place-items-center rounded-lg bg-primary text-primary-foreground shadow-sm">
             <Command :size="17" />
@@ -45,13 +47,25 @@ const route = useRoute()
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton as-child :is-active="route.name === 'profiles'" tooltip="Profiles">
-                  <RouterLink to="/profiles"><LayoutGrid :size="18" /><span>Profiles</span></RouterLink>
+                <SidebarMenuButton
+                  as-child
+                  :is-active="route.name === 'profiles'"
+                  tooltip="Profiles"
+                >
+                  <RouterLink to="/profiles">
+                    <LayoutGrid :size="18" /><span>Profiles</span>
+                  </RouterLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton as-child :is-active="route.name === 'settings'" tooltip="Settings">
-                  <RouterLink to="/settings"><Settings :size="18" /><span>Settings</span></RouterLink>
+                <SidebarMenuButton
+                  as-child
+                  :is-active="route.name === 'settings'"
+                  tooltip="Settings"
+                >
+                  <RouterLink to="/settings">
+                    <Settings :size="18" /><span>Settings</span>
+                  </RouterLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -65,7 +79,11 @@ const route = useRoute()
           <SidebarTrigger />
           <Breadcrumb>
             <BreadcrumbList>
-              <BreadcrumbItem><BreadcrumbPage class="text-muted-foreground">Workspace</BreadcrumbPage></BreadcrumbItem>
+              <BreadcrumbItem>
+                <BreadcrumbPage class="text-muted-foreground">
+                  Workspace
+                </BreadcrumbPage>
+              </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem><BreadcrumbPage>{{ route.name === 'settings' ? 'Settings' : route.name === 'profile' ? 'Edit profile' : 'Profiles' }}</BreadcrumbPage></BreadcrumbItem>
             </BreadcrumbList>
@@ -77,4 +95,5 @@ const route = useRoute()
       </main>
     </SidebarInset>
   </SidebarProvider>
+  <Toaster position="top-right" />
 </template>

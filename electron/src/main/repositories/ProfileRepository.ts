@@ -31,10 +31,21 @@ export default class ProfileRepository extends BaseProfileRepository {
 
             const profile = JSON.parse(fs.readFileSync(filename, 'utf-8')) as ProfileSchema;
 
+            profile.id = entry.name;
+            profile.directory = path.join(this.directory, entry.name);
+
             profiles.push(profile);
         }
 
         return profiles
+    }
+
+    public async findById(id: string): Promise<ProfileSchema | null> {
+        const all = await this.findMany();
+
+        const profile = all.find(p => p.id === id);
+
+        return profile || null;
     }
 
     public async create(payload?: Partial<Omit<ProfileSchema, "id">>): Promise<ProfileSchema> {
@@ -45,6 +56,7 @@ export default class ProfileRepository extends BaseProfileRepository {
         }
 
         const port = await getPort()
+        profile.name = payload?.name || `Profile ${profile.id}`;
 
         profile.env = {
             ZENITH_PORT: String(port),
@@ -65,10 +77,50 @@ export default class ProfileRepository extends BaseProfileRepository {
         fs.mkdirSync(profile.directory, { recursive: true });
 
         const filename = path.join(profile.directory, 'profile.json');
-        const json = JSON.stringify(profile, null, 4);
 
-        fs.writeFileSync(filename, json, 'utf-8');
+        const json = {
+            name: profile.name,
+            description: profile.description,
+            data_directory: profile.data_directory,
+            env: profile.env,
+            node_path: profile.node_path,
+            zenith_path: profile.zenith_path,
+            created_at: profile.created_at,
+            updated_at: profile.updated_at,
+        }
+
+        const text = JSON.stringify(json, null, 4);
+
+        fs.writeFileSync(filename, text, 'utf-8');
 
         return profile
+    }
+
+    public async updateById(id: string, payload: Partial<Omit<ProfileSchema, "id">>): Promise<ProfileSchema> {
+        const profile = await this.findByIdOrFail(id);
+
+        const json = {
+            name: payload.name || profile.name,
+            description: payload.description || profile.description,
+            data_directory: payload.data_directory || profile.data_directory,
+            env: payload.env || profile.env,
+            node_path: payload.node_path || profile.node_path,
+            zenith_path: payload.zenith_path || profile.zenith_path,
+            created_at: profile.created_at,
+            updated_at: new Date().toISOString(),
+        }
+
+        const filename = path.join(this.directory, id, 'profile.json');
+        const text = JSON.stringify(json, null, 4);
+
+        fs.writeFileSync(filename, text, 'utf-8');
+
+        return profile;
+    }
+
+    public async deleteById(id: string): Promise<void> {
+        const profile = await this.findByIdOrFail(id);
+
+        fs.rmSync(profile.directory, { recursive: true, force: true });
     }
 }

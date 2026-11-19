@@ -9,12 +9,14 @@ export default class ProfileRepository {
         throw error;
     }
 
-    public findByIdOrFail(id: string): Promise<ProfileSchema> {
-        const error = new Error("Method not implemented.");
+    public async findByIdOrFail(id: string): Promise<ProfileSchema> {
+        const response = await this.findById(id);
 
-        Object.assign(error, { id });
+        if (!response) {
+            throw new Error(`Profile with id ${id} not found`);
+        }
 
-        throw error;
+        return response;
     }
 
     public async findMany(): Promise<ProfileSchema[]> {
