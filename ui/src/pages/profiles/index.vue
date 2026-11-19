@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { AppWindow, Play, Pencil, Trash2 } from '@lucide/vue'
+import { AppWindow, FolderPlus, Play, Pencil, Trash2 } from '@lucide/vue'
 import ProfileCreateDialog from '@/components/ProfileCreateDialog.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import PageSubtitle from '@/components/PageSubtitle.vue'
@@ -36,7 +36,29 @@ onMounted(load)
       <ProfileCreateDialog />
     </PageHeader>
 
-    <div class="flex flex-wrap">
+    <div
+      v-if="profiles.length === 0"
+      class="flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed py-20 text-center"
+    >
+      <div class="grid size-16 place-items-center rounded-2xl bg-primary/10 text-primary">
+        <FolderPlus
+          :size="32"
+          :stroke-width="1.7"
+        />
+      </div>
+      <div class="space-y-1">
+        <p class="text-sm font-semibold">No profiles yet</p>
+        <p class="max-w-xs text-xs text-muted-foreground">
+          Create your first profile to start running your local Express applications.
+        </p>
+      </div>
+      <ProfileCreateDialog />
+    </div>
+
+    <div
+      v-else
+      class="flex flex-wrap"
+    >
       <div
         v-for="profile in profiles"
         :key="profile.id"
