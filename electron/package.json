@@ -30,6 +30,7 @@
     "@electron-forge/plugin-fuses": "^8.0.1",
     "@electron-forge/plugin-vite": "^8.0.1",
     "@electron/fuses": "^2.1.3",
+    "@sidekick-coder/zenith-kit": "^0.5.2",
     "@types/electron-squirrel-startup": "^1.0.2",
     "electron": "45.3.4",
     "oxfmt": "^0.41.0",
@@ -38,6 +39,7 @@
     "vite": "^8.3.8"
   },
   "dependencies": {
+    "core": "file:../core",
     "electron-squirrel-startup": "^1.0.1"
   }
 }
