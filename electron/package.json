@@ -1,6 +1,6 @@
 {
-  "name": "electron",
-  "productName": "electron",
+  "name": "@sidekick-coder/zenith-desktop",
+  "productName": "zenith-desktop",
   "version": "1.0.0",
   "private": true,
   "description": "My Electron application description",
@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "core": "file:../core",
-    "electron-squirrel-startup": "^1.0.1"
+    "electron-squirrel-startup": "^1.0.1",
+    "get-port": "^7.2.0"
   }
 }

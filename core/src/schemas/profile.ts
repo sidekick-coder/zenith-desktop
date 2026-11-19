@@ -9,9 +9,12 @@ export function profileSchema() {
         description: v.optional(v.string()),
 
         directory: v.string(),
-        data_folder: v.string(),
+        data_directory: v.string(),
 
         env: v.record(v.string(), v.string()),
+
+        node_path: v.optional(v.string()),
+        zenith_path: v.optional(v.string()),
 
         created_at: v.string(),
         updated_at: v.string(),

@@ -1,6 +1,7 @@
-import { validator } from '@sidekick-coder/zenith-kit/shared';
 import BaseProfileRepository from 'core/repositories/ProfileRepository.ts';
-import { profileSchema, ProfileSchema } from 'core/schemas/profile.js';
+import { ProfileSchema } from 'core/schemas/profile.js';
+import { app } from 'electron';
+import getPort from 'get-port';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -36,27 +37,38 @@ export default class ProfileRepository extends BaseProfileRepository {
         return profiles
     }
 
-    public async create(payload: Partial<ProfileSchema>): Promise<ProfileSchema> {
-        const profile = validator.validate(payload, profileSchema.create)
+    public async create(payload?: Partial<Omit<ProfileSchema, "id">>): Promise<ProfileSchema> {
+        const profile = { ...payload, } as ProfileSchema;
 
-        const json = {
-            ...profile,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
+        if (!profile.id) {
+            throw new Error("Profile id is required");
         }
 
-        const directory = path.join(this.directory, profile.id);
+        const port = await getPort()
 
-        if (fs.existsSync(directory)) {
+        profile.env = {
+            ZENITH_PORT: String(port),
+            ZENITH_APP_URL: `http://localhost:${port}`,
+            ZENITH_TMP_PATH: path.join(app.getPath('temp'), 'zenith', profile.id),
+        };
+
+        profile.directory = path.join(this.directory, profile.id);
+        profile.data_directory = payload?.data_directory || path.join(profile.directory, 'data');
+
+        profile.created_at = new Date().toISOString();
+        profile.updated_at = new Date().toISOString();
+
+        if (fs.existsSync(profile.directory)) {
             throw new Error(`Profile with id ${profile.id} already exists`);
         }
 
-        fs.mkdirSync(directory, { recursive: true });
+        fs.mkdirSync(profile.directory, { recursive: true });
 
-        const filename = path.join(directory, 'profile.json');
+        const filename = path.join(profile.directory, 'profile.json');
+        const json = JSON.stringify(profile, null, 4);
 
-        fs.writeFileSync(filename, JSON.stringify(json, null, 4), 'utf-8');
+        fs.writeFileSync(filename, json, 'utf-8');
 
-        return json
+        return profile
     }
 }

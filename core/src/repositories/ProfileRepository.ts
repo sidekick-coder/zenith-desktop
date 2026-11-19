@@ -1,4 +1,4 @@
-import { ProfileSchema } from "../schemas/profile.ts";
+import type { ProfileSchema } from "../schemas/profile.ts";
 
 export default class ProfileRepository {
     public async findById(id: string): Promise<ProfileSchema | null> {
@@ -21,10 +21,10 @@ export default class ProfileRepository {
         throw new Error("Method not implemented.");
     }
 
-    public async create(profile: Partial<ProfileSchema>): Promise<ProfileSchema> {
+    public async create(payload?: Partial<ProfileSchema>): Promise<ProfileSchema> {
         const error = new Error("Method not implemented.");
 
-        Object.assign(error, { profile });
+        Object.assign(error, { payload });
 
         throw error;
     }
