@@ -17,6 +17,12 @@ export default class ZenithService {
         throw error;
     }
 
+    public killAll(): Promise<void> {
+        const error = new Error("Method not implemented.");
+
+        throw error;
+    }
+
     public async list(): Promise<ServerSchema[]> {
         const error = new Error("Method not implemented.");
 

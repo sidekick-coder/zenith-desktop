@@ -1,6 +1,19 @@
-import { app, BrowserWindow } from 'electron';
+import { app } from 'electron';
 import started from 'electron-squirrel-startup';
-import { createMainWindow } from './main/windows/main';
+import { defineCommand, runMain, showUsage } from 'citty';
+import pkg from '../package.json' with { type: 'json' };
+
+const program = defineCommand({
+    meta: {
+        name: "zenith-desktop",
+        version: pkg.version,
+    },
+    default: "main",
+    subCommands: {
+        open: () => import('./main/commands/open.ts').then(m => m.default),
+        main: () => import('./main/commands/main.ts').then(m => m.default),
+    },
+})
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -11,16 +24,19 @@ if (started) {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
-    createMainWindow();
-
     await import('./main/ipc/profiles');
     await import('./main/ipc/zenith');
 
-    // On OS X it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) {
-            createMainWindow();
+    const args = app.isPackaged ? process.argv.slice(1) : process.argv.slice(2);
+
+    console.log(args)
+
+    await runMain(program, {
+        rawArgs: app.isPackaged ? process.argv.slice(1) : process.argv.slice(2),
+        async showUsage(cmd, parent) {
+            await showUsage(cmd, parent);
+
+            app.quit();
         }
     });
 });

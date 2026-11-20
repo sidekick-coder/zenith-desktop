@@ -42,6 +42,16 @@ export default class ZenithService extends BaseService {
         closeProfileWindows(profileId);
     }
 
+    public async killAll() {
+        for (const [profileId, server] of this.servers.entries()) {
+            await server.stop();
+
+            closeProfileWindows(profileId);
+        }
+
+        this.servers.clear();
+    }
+
     public async list() {
         const servers = [] as ServerSchema[];
 
