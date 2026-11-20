@@ -29,10 +29,8 @@ app.whenReady().then(async () => {
 
     const args = app.isPackaged ? process.argv.slice(1) : process.argv.slice(2);
 
-    console.log(args)
-
     await runMain(program, {
-        rawArgs: app.isPackaged ? process.argv.slice(1) : process.argv.slice(2),
+        rawArgs: args,
         async showUsage(cmd, parent) {
             await showUsage(cmd, parent);
 
