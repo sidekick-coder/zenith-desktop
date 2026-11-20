@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { $try } from '@/utils/try'
+import { $try } from 'core/utils/try.ts'
 
 defineOptions({ inheritAttrs: false })
 

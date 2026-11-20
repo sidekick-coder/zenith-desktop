@@ -55,20 +55,28 @@ function removeVariable(key: string) {
             Configure variables passed to this application.
           </CardDescription>
         </div>
-        <Button variant="outline" size="sm" @click="addVariable">
+        <Button
+          variant="outline"
+          size="sm"
+          @click="addVariable"
+        >
           <Plus :size="14" /> Add variable
         </Button>
       </div>
     </CardHeader>
     <CardContent class="space-y-3">
-      <div v-for="[key, value] in variables" :key="key" class="flex items-end gap-2">
+      <div
+        v-for="[key, value] in variables"
+        :key="key"
+        class="flex items-end gap-2"
+      >
         <div class="min-w-0 flex-1 space-y-2">
           <Label :for="`env-key-${key}`">Key</Label>
           <Input
             :id="`env-key-${key}`"
             :model-value="key"
             placeholder="KEY"
-            @update:model-value="updateKey(key, String($event), value)"
+            @change="updateKey(key, String($event.target.value), value)"
           />
         </div>
         <div class="min-w-0 flex-1 space-y-2">
@@ -77,7 +85,7 @@ function removeVariable(key: string) {
             :id="`env-value-${key}`"
             :model-value="value"
             placeholder="Value"
-            @update:model-value="updateValue(key, String($event))"
+            @change="updateValue(key, String($event.target.value))"
           />
         </div>
         <Button
@@ -89,7 +97,10 @@ function removeVariable(key: string) {
           <Trash2 :size="16" />
         </Button>
       </div>
-      <p v-if="variables.length === 0" class="text-sm text-muted-foreground">
+      <p
+        v-if="variables.length === 0"
+        class="text-sm text-muted-foreground"
+      >
         No environment variables added.
       </p>
     </CardContent>

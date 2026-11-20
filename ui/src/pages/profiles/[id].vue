@@ -12,13 +12,14 @@ import PageHeader from '@/components/PageHeader.vue'
 import PageSubtitle from '@/components/PageSubtitle.vue'
 import PageTitle from '@/components/PageTitle.vue'
 import { toast } from 'vue-sonner'
-import { $try } from '@/utils/try'
+import { $try } from 'core/utils/try.ts'
 
 const route = useRoute()
 const platform = window.platform
 
 const profile = ref<ProfileSchema>()
 const saving = ref(false)
+const launching = ref(false)
 
 const { handleSubmit, resetForm } = useForm({
   validationSchema: toTypedSchema(profileSchema.create()),
@@ -32,6 +33,24 @@ async function load() {
   })
 
   profile.value = response
+}
+
+async function launch() {
+  launching.value = true
+
+  const [error] = await $try(() => platform.zenith.launch(profile.value!.id))
+
+  if (error) {
+    toast.error(error instanceof Error ? error.message : 'Failed to launch profile.')
+    launching.value = false
+    return
+  }
+
+  toast.success('Launched successfully!')
+
+  await new Promise((resolve) => setTimeout(resolve, 800)) // simulate launch delay
+
+  launching.value = false
 }
 
 const onSubmit = handleSubmit(async (values) => {
@@ -87,7 +106,8 @@ onMounted(load)
         </zd-btn>
         <zd-btn
           type="button"
-          @click="onSubmit"
+          :loading="launching"
+          @click="launch"
         >
           <Play :size="16" /> Lauch
         </zd-btn>

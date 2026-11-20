@@ -13,5 +13,10 @@ contextBridge.exposeInMainWorld("platform", {
         updateById: (id: string, profile: Partial<Omit<ProfileSchema, "id">>) => ipcRenderer.invoke("profiles:updateById", id, profile),
         deleteById: (id: string) => ipcRenderer.invoke("profiles:deleteById", id),
         create: (payload: Partial<ProfileSchema>) => ipcRenderer.invoke("profiles:create", payload),
+    },
+    zenith: {
+        launch: (id: string) => ipcRenderer.invoke("zenith:launch", id),
+        kill: (id: string) => ipcRenderer.invoke("zenith:kill", id),
+        list: () => ipcRenderer.invoke("zenith:list"),
     }
 });

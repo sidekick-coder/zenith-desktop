@@ -4,6 +4,8 @@ import { Loader2 } from '@lucide/vue'
 import UiButton from '@/components/ui/button/Button.vue'
 const RouterLink = resolveComponent('RouterLink')
 
+defineOptions({ inheritAttrs: false, })
+
 const props = defineProps({
     label: {
         type: String,
@@ -26,8 +28,6 @@ const props = defineProps({
         default: null,
     },
 })
-
-defineOptions({ inheritAttrs: false, })
 
 const loading = defineModel<boolean>('loading', {
     type: Boolean,

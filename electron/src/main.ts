@@ -1,6 +1,5 @@
 import { app, BrowserWindow } from 'electron';
 import started from 'electron-squirrel-startup';
-import profiles from './main/ipc/profiles';
 import { createMainWindow } from './main/windows/main';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -14,7 +13,8 @@ if (started) {
 app.whenReady().then(async () => {
     createMainWindow();
 
-    await profiles()
+    await import('./main/ipc/profiles');
+    await import('./main/ipc/zenith');
 
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.

@@ -1,24 +1,55 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { AppWindow, FolderPlus, Play, Pencil, Trash2 } from '@lucide/vue'
+import { AppWindow, FolderPlus, Play, Square, Pencil, Trash2 } from '@lucide/vue'
 import ProfileCreateDialog from '@/components/ProfileCreateDialog.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import PageSubtitle from '@/components/PageSubtitle.vue'
 import PageTitle from '@/components/PageTitle.vue'
-import type { ProfileSchema } from 'core/schemas/profile.js'
+import type { ProfileSchema } from 'core/schemas/profile.ts'
+import type { ServerSchema } from 'core/schemas/server.ts'
+import { $try } from 'core/utils/try.js'
+import { toast } from 'vue-sonner'
 
-const launchMessage = ref('')
 const profiles = ref<ProfileSchema[]>([])
+const servers = ref<ServerSchema[]>([])
 const platform = window.platform
+const launchingIds = ref<string[]>([])
 
-async function load(){
+async function loadServers() {
+  const response = await window.platform.zenith.list()
+
+  servers.value = response
+}
+
+async function loadProfiles() {
   const response = await window.platform.profiles.findMany()
 
   profiles.value = response
 }
 
-function launch(name: string) {
-  launchMessage.value = `Launching ${name} is not available in the demo yet.`
+async function load() {
+  await Promise.all([loadProfiles(), loadServers()])
+}
+
+async function launch(id: string) {
+  launchingIds.value.push(id)
+
+  const [error] = await $try(() => platform.zenith.launch(id))
+
+  if (error) {
+    console.error(error)
+    launchingIds.value = launchingIds.value.filter(launchingId => launchingId !== id)
+    toast.error(error instanceof Error ? error.message : 'Failed to launch profile.')
+    return
+  }
+
+  launchingIds.value = launchingIds.value.filter(launchingId => launchingId !== id)
+
+  await load()
+}
+
+function isRunning(profileId: string) {
+  return servers.value.some(s => s.profile_id === profileId && s.status === 'running')
 }
 
 onMounted(load)
@@ -47,7 +78,9 @@ onMounted(load)
         />
       </div>
       <div class="space-y-1">
-        <p class="text-sm font-semibold">No profiles yet</p>
+        <p class="text-sm font-semibold">
+          No profiles yet
+        </p>
         <p class="max-w-xs text-xs text-muted-foreground">
           Create your first profile to start running your local Express applications.
         </p>
@@ -82,12 +115,25 @@ onMounted(load)
 
         <div class="ml-auto flex items-center gap-2">
           <zd-btn
+            v-if="!isRunning(profile.id)"
             variant="outline"
             size="icon"
-            @click="launch(profile.name || profile.id)"
+            :loading="launchingIds.includes(profile.id)"
+            @click="launch(profile.id)"
           >
             <Play :size="16" />
           </zd-btn>
+
+          <zd-btn-alert
+            v-else
+            variant="destructive"
+            size="icon"
+            :handle="() => platform.zenith.kill(profile.id)"
+            @success="load"
+          >
+            <Square :size="15" />
+          </zd-btn-alert>
+
           <zd-btn
             variant="outline"
             size="icon"
