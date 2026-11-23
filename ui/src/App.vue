@@ -3,7 +3,7 @@ import 'vue-sonner/style.css'
 import { Toaster } from '@/components/ui/sonner'
 import { ref } from 'vue'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
-import { CircleHelp, Command, LayoutGrid, Settings } from '@lucide/vue'
+import { CircleHelp, Command, LayoutGrid, Server, Settings } from '@lucide/vue'
 import {
   Sidebar,
   SidebarContent,
@@ -49,6 +49,17 @@ const route = useRoute()
               <SidebarMenuItem>
                 <SidebarMenuButton
                   as-child
+                  :is-active="route.name === 'servers'"
+                  tooltip="Servers"
+                >
+                  <RouterLink to="/servers">
+                    <Server :size="18" /><span>Servers</span>
+                  </RouterLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  as-child
                   :is-active="route.name === 'profiles'"
                   tooltip="Profiles"
                 >
@@ -85,7 +96,7 @@ const route = useRoute()
                 </BreadcrumbPage>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
-              <BreadcrumbItem><BreadcrumbPage>{{ route.name === 'settings' ? 'Settings' : route.name === 'profile' ? 'Edit profile' : 'Profiles' }}</BreadcrumbPage></BreadcrumbItem>
+              <BreadcrumbItem><BreadcrumbPage>{{ route.name === 'settings' ? 'Settings' : route.name === 'servers' ? 'Servers' : route.name === 'profile' ? 'Edit profile' : 'Profiles' }}</BreadcrumbPage></BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>

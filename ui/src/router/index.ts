@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import ProfilesPage from '@/pages/profiles/index.vue'
 import ProfilePage from '@/pages/profiles/[id].vue'
 import SettingsPage from '@/pages/settings/index.vue'
+import ServersPage from '@/pages/servers/index.vue'
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -10,6 +11,7 @@ const router = createRouter({
     { path: '/profiles', name: 'profiles', component: ProfilesPage },
     { path: '/profiles/:id', name: 'profile', component: ProfilePage },
     { path: '/settings', name: 'settings', component: SettingsPage },
+    { path: '/servers', name: 'servers', component: ServersPage },
   ],
 })
 

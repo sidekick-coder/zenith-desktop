@@ -25,6 +25,7 @@ if (started) {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
     await import('./main/ipc/profiles');
+    await import('./main/ipc/servers');
     await import('./main/ipc/zenith');
 
     const args = app.isPackaged ? process.argv.slice(1) : process.argv.slice(2);

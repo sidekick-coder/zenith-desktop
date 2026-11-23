@@ -14,6 +14,9 @@ contextBridge.exposeInMainWorld("platform", {
         deleteById: (id: string) => ipcRenderer.invoke("profiles:deleteById", id),
         create: (payload: Partial<ProfileSchema>) => ipcRenderer.invoke("profiles:create", payload),
     },
+    servers: {
+        findMany: (filter?: { id?: string; profile_id?: string }) => ipcRenderer.invoke("servers:findMany", filter),
+    },
     zenith: {
         launch: (id: string) => ipcRenderer.invoke("zenith:launch", id),
         kill: (id: string) => ipcRenderer.invoke("zenith:kill", id),

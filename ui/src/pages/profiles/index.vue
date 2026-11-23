@@ -114,18 +114,8 @@ onMounted(load)
         </div>
 
         <div class="ml-auto flex items-center gap-2">
-          <zd-btn
-            v-if="!isRunning(profile.id)"
-            variant="outline"
-            size="icon"
-            :loading="launchingIds.includes(profile.id)"
-            @click="launch(profile.id)"
-          >
-            <Play :size="16" />
-          </zd-btn>
-
           <zd-btn-alert
-            v-else
+            v-if="isRunning(profile.id)"
             variant="destructive"
             size="icon"
             :handle="() => platform.zenith.kill(profile.id)"
@@ -133,6 +123,15 @@ onMounted(load)
           >
             <Square :size="15" />
           </zd-btn-alert>
+
+          <zd-btn
+            variant="outline"
+            size="icon"
+            :loading="launchingIds.includes(profile.id)"
+            @click="launch(profile.id)"
+          >
+            <Play :size="16" />
+          </zd-btn>
 
           <zd-btn
             variant="outline"

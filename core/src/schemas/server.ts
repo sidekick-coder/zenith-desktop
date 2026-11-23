@@ -7,6 +7,7 @@ export function serverSchema() {
         id: v.string(),
         profile_id: v.string(),
         status: v.picklist(['starting', 'running', 'stopping', 'stopped']),
+        pid: v.optional(v.number()),
     })
 }
 
