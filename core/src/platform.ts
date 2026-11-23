@@ -5,6 +5,7 @@ import DesktopEntryService from './services/DesktopEntryService.ts'
 import ServerRepository from './repositories/ServerRepository.ts'
 import ZenithService from './services/ZenithService.ts'
 import type { DesktopEntrySchema } from './schemas/desktopEntry.ts'
+import type { ProfileSchema } from './schemas/profile.ts'
 
 type DesktopEntryPlatform = DesktopEntryService & {
     generate(entry: DesktopEntrySchema): Promise<string>
@@ -16,9 +17,13 @@ type DesktopEntryPlatform = DesktopEntryService & {
     deleteById(id: string): Promise<void>
 }
 
+type ProfilePlatform = ProfileRepository & {
+    selectIcon(id: string): Promise<ProfileSchema | null>
+}
+
 export default interface Platform {
     desktopEntries: DesktopEntryPlatform
-    profiles: ProfileRepository
+    profiles: ProfilePlatform
     nodes: NodeRepository
     releases: ReleaseRepository
     servers: ServerRepository

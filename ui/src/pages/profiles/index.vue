@@ -101,7 +101,14 @@ onMounted(load)
           class="flex min-w-0 items-center gap-4 rounded-lg text-left focus-visible:outline-2 focus-visible:outline-ring"
         >
           <div class="grid size-16 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
+            <img
+              v-if="profile.icon_path"
+              :src="`media://${profile.icon_path}`"
+              :alt="`${profile.name || profile.id} icon`"
+              class="size-full rounded-2xl object-cover"
+            >
             <AppWindow
+              v-else
               :size="31"
               :stroke-width="1.7"
             />

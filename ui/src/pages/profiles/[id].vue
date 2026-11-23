@@ -2,13 +2,12 @@
 import { onMounted, ref } from 'vue'
 import { toTypedSchema } from '@vee-validate/valibot'
 import { useForm } from 'vee-validate'
-import { Check, Monitor, Play, Trash2 } from '@lucide/vue'
+import { Check, Play, Trash2 } from '@lucide/vue'
 import { useRoute } from 'vue-router'
 import { profileSchema, type ProfileSchema } from 'core/schemas/profile.ts'
 import ProfileFormApplication from '@/components/ProfileFormApplication.vue'
 import ProfileFormEnviroment from '@/components/ProfileFormEnviroment.vue'
 import ProfileFormRuntime from '@/components/ProfileFormRuntime.vue'
-import ProfileFormDesktopEntry from '@/components/ProfileFormDesktopEntry.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import PageSubtitle from '@/components/PageSubtitle.vue'
 import PageTitle from '@/components/PageTitle.vue'
@@ -21,10 +20,11 @@ const platform = window.platform
 const profile = ref<ProfileSchema>()
 const saving = ref(false)
 const launching = ref(false)
-const creatingDesktopEntry = ref(false)
+
+const schema = profileSchema.create()
 
 const { handleSubmit, resetForm } = useForm({
-  validationSchema: toTypedSchema(profileSchema.create()),
+  validationSchema: toTypedSchema(schema),
 })
 
 async function load() {
@@ -46,21 +46,6 @@ async function launch() {
     toast.error(error instanceof Error ? error.message : 'Failed to launch profile.')
     launching.value = false
     return
-  }
-
-  async function createDesktopEntry() {
-    creatingDesktopEntry.value = true
-
-    const [error, filename] = await $try(() => platform.desktopEntries.create(profile.value!))
-
-    creatingDesktopEntry.value = false
-
-    if (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to create desktop entry.')
-      return
-    }
-
-    toast.success(`Desktop entry created at ${filename}`)
   }
 
   toast.success('Launched successfully!')
@@ -123,14 +108,6 @@ onMounted(load)
         </zd-btn>
         <zd-btn
           type="button"
-          variant="outline"
-          :loading="creatingDesktopEntry"
-          @click="createDesktopEntry"
-        >
-          <Monitor :size="16" /> Desktop entry
-        </zd-btn>
-        <zd-btn
-          type="button"
           :loading="launching"
           @click="launch"
         >
@@ -140,10 +117,9 @@ onMounted(load)
     </PageHeader>
 
     <div class="space-y-6">
-      <ProfileFormApplication />
+      <ProfileFormApplication v-model:profile="profile" />
       <ProfileFormEnviroment />
       <ProfileFormRuntime />
-      <ProfileFormDesktopEntry />
     </div>
   </form>
   <div

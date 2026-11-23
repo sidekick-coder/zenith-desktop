@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { Check, ArrowLeft } from '@lucide/vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import type { DesktopEntrySchema } from 'core/schemas/desktopEntry.ts'
 import { $try } from 'core/utils/try.ts'
 import PageHeader from '@/components/PageHeader.vue'
@@ -12,7 +11,6 @@ import { Input } from '@/components/ui/input'
 import { toast } from 'vue-sonner'
 
 const route = useRoute()
-const router = useRouter()
 const entry = ref<DesktopEntrySchema>()
 const loading = ref(false)
 const saving = ref(false)

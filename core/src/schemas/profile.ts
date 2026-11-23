@@ -2,7 +2,7 @@ import * as v from 'valibot'
 
 export interface ProfileSchema extends v.InferOutput<ReturnType<typeof profileSchema>> {}
 
-export function profileSchema() {
+function profileSchema() {
     return v.object({
         id: v.string(),
         name: v.string(),
@@ -10,6 +10,7 @@ export function profileSchema() {
 
         directory: v.string(),
         data_directory: v.string(),
+        icon_path: v.nullish(v.string()),
 
         env: v.record(v.string(), v.string()),
 
@@ -22,3 +23,6 @@ export function profileSchema() {
 }
 
 profileSchema.create = () => v.omit(profileSchema(), ['created_at', 'updated_at'])
+
+
+export { profileSchema }

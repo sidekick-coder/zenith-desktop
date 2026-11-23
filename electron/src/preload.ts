@@ -13,6 +13,8 @@ contextBridge.exposeInMainWorld("platform", {
         updateById: (id: string, profile: Partial<Omit<ProfileSchema, "id">>) => ipcRenderer.invoke("profiles:updateById", id, profile),
         deleteById: (id: string) => ipcRenderer.invoke("profiles:deleteById", id),
         create: (payload: Partial<ProfileSchema>) => ipcRenderer.invoke("profiles:create", payload),
+        selectIcon: (id: string) => ipcRenderer.invoke("profiles:selectIcon", id),
+        getIconData: (id: string) => ipcRenderer.invoke("profiles:getIconData", id),
     },
     desktopEntries: {
         create: (profile: ProfileSchema) => ipcRenderer.invoke("desktopEntries:create", profile),

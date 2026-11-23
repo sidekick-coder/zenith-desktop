@@ -33,6 +33,8 @@ export default class ProfileRepository extends BaseProfileRepository {
 
             profile.id = entry.name;
             profile.directory = path.join(this.directory, entry.name);
+            const iconFilename = path.join(profile.directory, 'icon.png');
+            profile.icon_path = fs.existsSync(iconFilename) ? iconFilename : null;
 
             profiles.push(profile);
         }
@@ -66,6 +68,7 @@ export default class ProfileRepository extends BaseProfileRepository {
 
         profile.directory = path.join(this.directory, profile.id);
         profile.data_directory = payload?.data_directory || path.join(profile.directory, 'data');
+        profile.icon_path = null;
 
         profile.created_at = new Date().toISOString();
         profile.updated_at = new Date().toISOString();
@@ -82,6 +85,7 @@ export default class ProfileRepository extends BaseProfileRepository {
             name: profile.name,
             description: profile.description,
             data_directory: profile.data_directory,
+            icon_path: profile.icon_path,
             env: profile.env,
             node_path: profile.node_path,
             zenith_path: profile.zenith_path,
@@ -103,6 +107,7 @@ export default class ProfileRepository extends BaseProfileRepository {
             name: payload.name || profile.name,
             description: payload.description || profile.description,
             data_directory: payload.data_directory || profile.data_directory,
+            icon_path: profile.icon_path,
             env: payload.env || profile.env,
             node_path: payload.node_path || profile.node_path,
             zenith_path: payload.zenith_path || profile.zenith_path,
@@ -116,6 +121,28 @@ export default class ProfileRepository extends BaseProfileRepository {
         fs.writeFileSync(filename, text, 'utf-8');
 
         return profile;
+    }
+
+    public async updateIconById(id: string, source: string): Promise<ProfileSchema> {
+        const profile = await this.findByIdOrFail(id);
+        const destination = path.join(profile.directory, 'icon.png');
+
+        if (source !== destination) {
+            fs.copyFileSync(source, destination);
+        }
+
+        return this.findByIdOrFail(id);
+    }
+
+    public async getIconDataById(id: string): Promise<string | null> {
+        const profile = await this.findByIdOrFail(id);
+        const filename = path.join(profile.directory, 'icon.png');
+
+        if (!fs.existsSync(filename)) {
+            return null;
+        }
+
+        return `data:image/png;base64,${fs.readFileSync(filename).toString('base64')}`;
     }
 
     public async deleteById(id: string): Promise<void> {

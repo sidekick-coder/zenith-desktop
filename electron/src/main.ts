@@ -1,7 +1,8 @@
-import { app } from 'electron';
+import { app, net, protocol } from 'electron';
 import started from 'electron-squirrel-startup';
 import { defineCommand, runMain, showUsage } from 'citty';
 import pkg from '../package.json' with { type: 'json' };
+import { pathToFileURL } from 'node:url';
 
 const program = defineCommand({
     meta: {
@@ -20,6 +21,7 @@ if (started) {
     app.quit();
 }
 
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -30,6 +32,13 @@ app.whenReady().then(async () => {
     await import('./main/ipc/releases');
     await import('./main/ipc/servers');
     await import('./main/ipc/zenith');
+
+    // media protocol 
+    protocol.handle('media', (request) => {
+        const filePath = new URL(request.url).pathname;
+
+        return net.fetch(pathToFileURL(filePath).toString());
+    });
 
     const args = app.isPackaged ? process.argv.slice(1) : process.argv.slice(2);
 
