@@ -2,7 +2,7 @@
 import 'vue-sonner/style.css'
 import { Toaster } from '@/components/ui/sonner'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
-import { Command, Download, LayoutGrid, Package, Server, Settings } from '@lucide/vue'
+import { Command, Download, LayoutGrid, Monitor, Package, Server, Settings } from '@lucide/vue'
 import {
   Sidebar,
   SidebarContent,
@@ -47,6 +47,11 @@ const links = [
     icon: Package,
     label: 'Zenith',
     to: '/downloads',
+  },
+  {
+    icon: Monitor,
+    label: 'Shortcuts',
+    to: '/desktop-entries',
   },
   {
     icon: Settings,
@@ -109,6 +114,7 @@ const links = [
                 <BreadcrumbPage>
                   {{ route.name === 'settings' ? 'Settings' : route.name === 'nodes' ? 'Node.js' :
                     route.name === 'downloads' ? 'Zenith' :
+                    route.name === 'desktop-entries' ? 'Desktop entries' :
                     route.name === 'servers' ? 'Servers' : route.name === 'profile' ? 'Edit profile' : 'Profiles' }}
                 </BreadcrumbPage>
               </BreadcrumbItem>

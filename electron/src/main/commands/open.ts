@@ -11,11 +11,20 @@ export default defineCommand({
         profileId: {
             type: "positional",
             description: "The ID of the profile to open",
-            required: true,
+            required: false,
+        },
+        profile: {
+            type: "string",
+            description: "The ID of the profile to open",
+            required: false,
         },
     },
     run: async ({ args }) => {
-        const { profileId } = args;
+        const profileId = args.profile || args.profileId;
+
+        if (!profileId) {
+            throw new Error("A profile ID is required.");
+        }
 
         const profile = await profiles.findByIdOrFail(profileId);
 

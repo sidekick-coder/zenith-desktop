@@ -25,6 +25,7 @@ if (started) {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
     await import('./main/ipc/profiles');
+    await import('./main/ipc/desktopEntries');
     await import('./main/ipc/nodes');
     await import('./main/ipc/releases');
     await import('./main/ipc/servers');

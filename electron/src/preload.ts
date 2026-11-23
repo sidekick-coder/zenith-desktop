@@ -14,6 +14,16 @@ contextBridge.exposeInMainWorld("platform", {
         deleteById: (id: string) => ipcRenderer.invoke("profiles:deleteById", id),
         create: (payload: Partial<ProfileSchema>) => ipcRenderer.invoke("profiles:create", payload),
     },
+    desktopEntries: {
+        create: (profile: ProfileSchema) => ipcRenderer.invoke("desktopEntries:create", profile),
+        generate: (entry: Record<string, string>) => ipcRenderer.invoke("desktopEntries:generate", entry),
+        list: () => ipcRenderer.invoke("desktopEntries:list"),
+        createEmpty: () => ipcRenderer.invoke("desktopEntries:createEmpty"),
+        createControlPanel: () => ipcRenderer.invoke("desktopEntries:createControlPanel"),
+        findOne: (filter: { id?: string; profile_id?: string }) => ipcRenderer.invoke("desktopEntries:findOne", filter),
+        updateById: (id: string, payload: Record<string, string>) => ipcRenderer.invoke("desktopEntries:updateById", id, payload),
+        deleteById: (id: string) => ipcRenderer.invoke("desktopEntries:deleteById", id),
+    },
     nodes: {
         list: () => ipcRenderer.invoke("nodes:list"),
         download: (version: string) => ipcRenderer.invoke("nodes:download", version),
