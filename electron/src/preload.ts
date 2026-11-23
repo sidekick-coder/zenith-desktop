@@ -20,6 +20,12 @@ contextBridge.exposeInMainWorld("platform", {
         remove: (version: string) => ipcRenderer.invoke("nodes:remove", version),
         path: (version: string) => ipcRenderer.invoke("nodes:path", version),
     },
+    releases: {
+        list: () => ipcRenderer.invoke("releases:list"),
+        download: (tagName: string) => ipcRenderer.invoke("releases:download", tagName),
+        remove: (tagName: string) => ipcRenderer.invoke("releases:remove", tagName),
+        path: (tagName: string) => ipcRenderer.invoke("releases:path", tagName),
+    },
     servers: {
         findMany: (filter?: { id?: string; profile_id?: string }) => ipcRenderer.invoke("servers:findMany", filter),
     },
