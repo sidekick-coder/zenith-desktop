@@ -14,6 +14,12 @@ contextBridge.exposeInMainWorld("platform", {
         deleteById: (id: string) => ipcRenderer.invoke("profiles:deleteById", id),
         create: (payload: Partial<ProfileSchema>) => ipcRenderer.invoke("profiles:create", payload),
     },
+    nodes: {
+        list: () => ipcRenderer.invoke("nodes:list"),
+        download: (version: string) => ipcRenderer.invoke("nodes:download", version),
+        remove: (version: string) => ipcRenderer.invoke("nodes:remove", version),
+        path: (version: string) => ipcRenderer.invoke("nodes:path", version),
+    },
     servers: {
         findMany: (filter?: { id?: string; profile_id?: string }) => ipcRenderer.invoke("servers:findMany", filter),
     },

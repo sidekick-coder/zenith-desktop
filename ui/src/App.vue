@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import 'vue-sonner/style.css'
 import { Toaster } from '@/components/ui/sonner'
-import { ref } from 'vue'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
-import { CircleHelp, Command, LayoutGrid, Server, Settings } from '@lucide/vue'
+import { Command, Download, LayoutGrid, Server, Settings } from '@lucide/vue'
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -28,6 +26,29 @@ import {
 } from '@/components/ui/breadcrumb'
 
 const route = useRoute()
+
+const links = [
+  {
+    icon: LayoutGrid,
+    label: 'Profiles',
+    to: '/profiles',
+  },
+  {
+    icon: Server,
+    label: 'Servers',
+    to: '/servers',
+  },
+  {
+    icon: Download,
+    label: 'Node.js',
+    to: '/nodes',
+  },
+  {
+    icon: Settings,
+    label: 'Settings',
+    to: '/settings',
+  },
+]
 </script>
 
 <template>
@@ -48,34 +69,17 @@ const route = useRoute()
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
+                  v-for="link in links"
+                  :key="link.label"
                   as-child
-                  :is-active="route.name === 'servers'"
-                  tooltip="Servers"
+                  :is-active="route.path === link.to"
+                  :tooltip="link.label"
                 >
-                  <RouterLink to="/servers">
-                    <Server :size="18" /><span>Servers</span>
-                  </RouterLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  as-child
-                  :is-active="route.name === 'profiles'"
-                  tooltip="Profiles"
-                >
-                  <RouterLink to="/profiles">
-                    <LayoutGrid :size="18" /><span>Profiles</span>
-                  </RouterLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  as-child
-                  :is-active="route.name === 'settings'"
-                  tooltip="Settings"
-                >
-                  <RouterLink to="/settings">
-                    <Settings :size="18" /><span>Settings</span>
+                  <RouterLink :to="link.to">
+                    <component
+                      :is="link.icon"
+                      :size="18"
+                    /><span>{{ link.label }}</span>
                   </RouterLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -96,7 +100,12 @@ const route = useRoute()
                 </BreadcrumbPage>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
-              <BreadcrumbItem><BreadcrumbPage>{{ route.name === 'settings' ? 'Settings' : route.name === 'servers' ? 'Servers' : route.name === 'profile' ? 'Edit profile' : 'Profiles' }}</BreadcrumbPage></BreadcrumbItem>
+              <BreadcrumbItem>
+                <BreadcrumbPage>
+                  {{ route.name === 'settings' ? 'Settings' : route.name === 'nodes' ? 'Node.js' :
+                    route.name === 'servers' ? 'Servers' : route.name === 'profile' ? 'Edit profile' : 'Profiles' }}
+                </BreadcrumbPage>
+              </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>

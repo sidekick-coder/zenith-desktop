@@ -66,7 +66,11 @@ export default class ZenithService extends BaseService {
             throw new Error(`Server for profile with id ${profileId} has no PID.`);
         }
 
-        process.kill(server.pid || 0);
+        const killed = await this.isKilled(server);
+
+        if (!killed && server.pid) {
+            process.kill(server.pid);
+        }
 
         await servers.destoryById(server.id);
 

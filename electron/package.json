@@ -42,6 +42,8 @@
     "citty": "^0.2.2",
     "core": "file:../core",
     "electron-squirrel-startup": "^1.0.1",
-    "get-port": "^7.2.0"
+    "extract-zip": "^2.0.1",
+    "get-port": "^7.2.0",
+    "tar": "^7.5.23"
   }
 }
