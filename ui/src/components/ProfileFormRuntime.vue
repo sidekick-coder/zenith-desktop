@@ -3,14 +3,22 @@ import { onMounted, ref } from 'vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import type { NodeSchema } from 'core/schemas/node.ts'
 import { $try } from 'core/utils/try.ts'
 import { toast } from 'vue-sonner'
+import { ChevronDown } from '@lucide/vue'
+import { useFormContext } from 'vee-validate'
 
 type DownloadedNode = NodeSchema & { path: string }
 
 const nodes = ref<DownloadedNode[]>([])
+const { setFieldValue } = useFormContext()
 
 async function loadNodes() {
   const [error, response] = await $try(() => window.platform.nodes.list())
@@ -37,7 +45,10 @@ onMounted(loadNodes)
       <CardTitle>Runtime</CardTitle>
     </CardHeader>
     <CardContent class="space-y-5">
-      <FormField v-slot="{ componentField }" name="node_path">
+      <FormField
+        v-slot="{ componentField }"
+        name="node_path"
+      >
         <FormItem>
           <FormLabel>Node.js path</FormLabel>
           <FormControl>
@@ -47,30 +58,47 @@ onMounted(loadNodes)
                 class="flex-1"
                 placeholder="/path/to/node"
               />
-              <Select v-bind="componentField">
-                <SelectTrigger class="w-40">
-                  <SelectValue placeholder="Downloaded" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem
+              <DropdownMenu v-if="nodes.length">
+                <DropdownMenuTrigger as-child>
+                  <zd-btn
+                    type="button"
+                    variant="outline"
+                  >
+                    <ChevronDown :size="16" />
+                  </zd-btn>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
                     v-for="node in nodes"
                     :key="node.version"
-                    :value="node.path"
+                    @select="setFieldValue('node_path', node.path)"
                   >
                     {{ node.version }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    v-if="nodes.length === 0"
+                    disabled
+                  >
+                    No downloaded Node.js versions
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </FormControl>
           <FormMessage />
         </FormItem>
       </FormField>
-      <FormField v-slot="{ componentField }" name="zenith_path">
+      <FormField
+        v-slot="{ componentField }"
+        name="zenith_path"
+      >
         <FormItem>
           <FormLabel>Zenith path</FormLabel>
           <FormControl>
-            <Input v-bind="componentField" placeholder="/path/to/zenith" />
+            <Input
+              v-bind="componentField"
+              placeholder="/path/to/zenith"
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
