@@ -81,7 +81,10 @@ function selectCreationMode(mode: string) {
 }
 
 async function createEmpty() {
-  const [error, entry] = await $try(() => window.platform.desktopEntries.createEmpty())
+  const [error, entry] = await $try(async () => {
+    const draft = await window.platform.desktopEntries.make()
+    return window.platform.desktopEntries.create(draft)
+  })
 
   if (error) {
     console.error(error)
@@ -96,9 +99,13 @@ async function createFromProfile(profile: ProfileSchema) {
   profileLoading.value = true
   selectedProfileId.value = profile.id
 
-  const json = JSON.parse(JSON.stringify(profile))
+  const [createError, entry] = await $try(async () => {
+    const draft = await window.platform.desktopEntries.make({
+      profile_id: profile.id,
+    })
 
-  const [createError] = await $try(() =>  window.platform.desktopEntries.create(json))
+    return window.platform.desktopEntries.create(draft)
+  })
 
   if (createError) {
     console.error(createError)
@@ -108,25 +115,21 @@ async function createFromProfile(profile: ProfileSchema) {
     return
   }
 
-  const [findError, entry] = await $try(() => window.platform.desktopEntries.findOne({
-    profile_id: profile.id,
-  }))
-
   profileLoading.value = false
   selectedProfileId.value = null
-
-  if (findError || !entry) {
-    console.error(findError)
-    toast.error(findError instanceof Error ? findError.message : 'Created entry could not be found.')
-    return
-  }
 
   profileDialogOpen.value = false
   await router.push(`/desktop-entries/${entry.id}`)
 }
 
 async function createControlPanel() {
-  const [error, entry] = await $try(() => window.platform.desktopEntries.createControlPanel())
+  const [error, entry] = await $try(async () => {
+    const draft = await window.platform.desktopEntries.make({
+      controlPanel: true,
+    })
+
+    return window.platform.desktopEntries.create(draft)
+  })
 
   if (error) {
     console.error(error)

@@ -15,14 +15,6 @@ export default class DesktopEntryRepository {
         throw new Error("Method not implemented.");
     }
 
-    public async createEmpty(): Promise<DesktopEntrySchema> {
-        throw new Error("Method not implemented.");
-    }
-
-    public async createControlPanel(): Promise<DesktopEntrySchema> {
-        throw new Error("Method not implemented.");
-    }
-
     public async updateById(_id: string, _payload: Partial<Omit<DesktopEntrySchema, "id">>): Promise<DesktopEntrySchema> {
         throw new Error("Method not implemented.");
     }

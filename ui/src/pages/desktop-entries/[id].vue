@@ -9,12 +9,14 @@ import PageTitle from '@/components/PageTitle.vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { toast } from 'vue-sonner'
+import { RefreshCw } from '@lucide/vue'
 
 const route = useRoute()
 const entry = ref<DesktopEntrySchema>()
 const loading = ref(false)
 const saving = ref(false)
 const generating = ref(false)
+const refreshing = ref(false)
 
 async function loadEntry() {
   loading.value = true
@@ -79,6 +81,41 @@ async function generate() {
   toast.success(`Desktop entry generated at ${filename}`)
 }
 
+async function refreshFromProfile() {
+  if (!entry.value?.profile_id) return
+
+  refreshing.value = true
+
+  const [makeError, defaults] = await $try(() => window.platform.desktopEntries.make({
+    profile_id: entry.value!.profile_id,
+  }))
+
+  if (makeError) {
+    refreshing.value = false
+    console.error(makeError)
+    toast.error(makeError instanceof Error ? makeError.message : 'Failed to refresh desktop entry.')
+    return
+  }
+
+  const [updateError, response] = await $try(() => window.platform.desktopEntries.updateById(entry.value!.id, {
+    name: defaults.name,
+    comment: defaults.comment,
+    args: defaults.args,
+    icon_path: defaults.icon_path,
+  }))
+
+  refreshing.value = false
+
+  if (updateError) {
+    console.error(updateError)
+    toast.error(updateError instanceof Error ? updateError.message : 'Failed to refresh desktop entry.')
+    return
+  }
+
+  entry.value = response
+  toast.success('Desktop entry refreshed from profile.')
+}
+
 onMounted(loadEntry)
 </script>
 
@@ -105,6 +142,15 @@ onMounted(loadEntry)
           @click="generate"
         >
           Generate
+        </zd-btn>
+        <zd-btn
+          v-if="entry.profile_id"
+          variant="outline"
+          :loading="refreshing"
+          @click="refreshFromProfile"
+        >
+          <RefreshCw :size="16" />
+          Refresh
         </zd-btn>
       </div>
     </PageHeader>
@@ -133,6 +179,10 @@ onMounted(loadEntry)
         <label class="grid gap-2 text-sm font-medium">
           Args
           <Input v-model="entry.args" />
+        </label>
+        <label class="grid gap-2 text-sm font-medium">
+          Icon path
+          <Input v-model="entry.icon_path" />
         </label>
         <label class="grid gap-2 text-sm font-medium md:col-span-2">
           Categories

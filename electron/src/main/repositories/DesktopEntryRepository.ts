@@ -30,7 +30,10 @@ export default class DesktopEntryRepository extends BaseDesktopEntryRepository {
             throw new Error(`Expected ${this.filename} to contain an array of desktop entries.`);
         }
 
-        return (entries as DesktopEntrySchema[]).filter(entry =>
+        return (entries as DesktopEntrySchema[]).map(entry => ({
+            ...entry,
+            icon_path: entry.icon_path ?? null,
+        })).filter(entry =>
             Object.entries(filter).every(([key, value]) => entry[key as keyof DesktopEntrySchema] === value)
         );
     }
@@ -52,38 +55,6 @@ export default class DesktopEntryRepository extends BaseDesktopEntryRepository {
         this.write(entries);
 
         return entry;
-    }
-
-    public async createEmpty(): Promise<DesktopEntrySchema> {
-        const id = crypto.randomUUID();
-        const entry: DesktopEntrySchema = {
-            id,
-            profile_id: "",
-            filename: `${id}.desktop`,
-            executable: app.getPath("exe"),
-            args: "",
-            name: "",
-            comment: "",
-            categories: "",
-        };
-
-        return this.create(entry);
-    }
-
-    public async createControlPanel(): Promise<DesktopEntrySchema> {
-        const id = crypto.randomUUID();
-        const entry: DesktopEntrySchema = {
-            id,
-            profile_id: "",
-            filename: `${id}.desktop`,
-            executable: app.getPath("exe"),
-            args: "main",
-            name: "Zenith control panel",
-            comment: "Open the Zenith control panel",
-            categories: "Development;",
-        };
-
-        return this.create(entry);
     }
 
     public async updateById(id: string, payload: Partial<Omit<DesktopEntrySchema, "id">>): Promise<DesktopEntrySchema> {

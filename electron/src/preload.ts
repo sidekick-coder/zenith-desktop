@@ -3,7 +3,9 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 //
 import { contextBridge, ipcRenderer } from "electron";
+import type { DesktopEntrySchema } from "core/schemas/desktopEntry.ts";
 import type { ProfileSchema } from "core/schemas/profile.ts";
+import type { MakePayload } from "core/services/DesktopEntryService.ts";
 
 contextBridge.exposeInMainWorld("platform", {
     profiles: {
@@ -17,11 +19,10 @@ contextBridge.exposeInMainWorld("platform", {
         getIconData: (id: string) => ipcRenderer.invoke("profiles:getIconData", id),
     },
     desktopEntries: {
-        create: (profile: ProfileSchema) => ipcRenderer.invoke("desktopEntries:create", profile),
+        make: (payload: MakePayload = {}) => ipcRenderer.invoke("desktopEntries:make", payload),
+        create: (entry: DesktopEntrySchema) => ipcRenderer.invoke("desktopEntries:create", entry),
         generate: (entry: Record<string, string>) => ipcRenderer.invoke("desktopEntries:generate", entry),
         list: () => ipcRenderer.invoke("desktopEntries:list"),
-        createEmpty: () => ipcRenderer.invoke("desktopEntries:createEmpty"),
-        createControlPanel: () => ipcRenderer.invoke("desktopEntries:createControlPanel"),
         findOne: (filter: { id?: string; profile_id?: string }) => ipcRenderer.invoke("desktopEntries:findOne", filter),
         updateById: (id: string, payload: Record<string, string>) => ipcRenderer.invoke("desktopEntries:updateById", id, payload),
         deleteById: (id: string) => ipcRenderer.invoke("desktopEntries:deleteById", id),

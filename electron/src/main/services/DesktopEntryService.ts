@@ -1,56 +1,47 @@
 import { app } from "electron";
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { ProfileSchema } from "core/schemas/profile.ts";
 import type { DesktopEntrySchema } from "core/schemas/desktopEntry.ts";
-import BaseDesktopEntryService from "core/services/DesktopEntryService.ts";
+import BaseDesktopEntryService, { type MakePayload } from "core/services/DesktopEntryService.ts";
 import DesktopEntryRepository from "../repositories/DesktopEntryRepository.ts";
+import profiles from "../facades/profiles.ts";
 
 export default class DesktopEntryService extends BaseDesktopEntryService {
     public repository = new DesktopEntryRepository();
 
-    public async create(profile: ProfileSchema): Promise<string> {
-        if (process.platform !== "linux") {
-            throw new Error("Desktop entries are currently supported on Linux only.");
+    public async make(payload: MakePayload = {}): Promise<DesktopEntrySchema> {
+        if (payload.controlPanel) {
+            const id = crypto.randomUUID();
+
+            return {
+                id,
+                profile_id: "",
+                icon_path: null,
+                filename: `${id}.desktop`,
+                executable: app.getPath("exe"),
+                args: "main",
+                name: "Zenith control panel",
+                comment: "Open the Zenith control panel",
+                categories: "Development;",
+            };
         }
 
-        const dataHome = process.env.XDG_DATA_HOME || path.join(app.getPath("home"), ".local", "share");
-        const directory = path.join(dataHome, "applications");
-        const filename = path.join(directory, `zenith-${this.filenamePart(profile.id)}.desktop`);
-        const entry = [
-            "[Desktop Entry]",
-            "Type=Application",
-            `Name=${this.escapeValue(profile.name || profile.id)}`,
-            `Comment=${this.escapeValue(profile.description || `Open ${profile.name || profile.id}`)}`,
-            `Exec=${this.quote(app.getPath("exe"))} open --profile ${this.quote(profile.id)}`,
-            "Terminal=false",
-            "Categories=Development;",
-            "",
-        ].join("\n");
+        const profile = payload.profile_id
+            ? await profiles.findByIdOrFail(payload.profile_id)
+            : null;
+        const id = profile?.id || crypto.randomUUID();
 
-        await fs.mkdir(directory, { recursive: true });
-        await fs.writeFile(filename, entry, { encoding: "utf-8", mode: 0o755 });
-        await fs.chmod(filename, 0o755);
-
-        const desktopEntry: DesktopEntrySchema = {
-            id: profile.id,
-            profile_id: profile.id,
-            filename,
+        return {
+            id,
+            profile_id: profile?.id || "",
+            icon_path: profile?.icon_path || null,
+            filename: `${id}.desktop`,
             executable: app.getPath("exe"),
-            args: `open --profile ${this.quote(profile.id)}`,
-            name: profile.name || profile.id,
-            comment: profile.description || `Open ${profile.name || profile.id}`,
+            args: profile ? `open --profile ${this.quote(profile.id)}` : "",
+            name: profile?.name || "",
+            comment: profile?.description || (profile ? `Open ${profile.name || profile.id}` : ""),
             categories: "Development;",
         };
-        const existing = await this.repository.findOne({ id: profile.id });
-
-        if (existing) {
-            await this.repository.updateById(profile.id, desktopEntry);
-        } else {
-            await this.repository.create(desktopEntry);
-        }
-
-        return filename;
     }
 
     public async generate(entry: DesktopEntrySchema): Promise<string> {
@@ -71,6 +62,7 @@ export default class DesktopEntryService extends BaseDesktopEntryService {
             `Comment=${this.escapeValue(entry.comment)}`,
             `Exec=${command}`,
             "Terminal=false",
+            ...(entry.icon_path ? [`Icon=${this.escapeValue(entry.icon_path)}`] : []),
             `Categories=${entry.categories}`,
             "",
         ].join("\n");
